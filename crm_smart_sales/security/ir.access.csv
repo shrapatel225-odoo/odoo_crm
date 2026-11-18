@@ -1,0 +1,10 @@
+id,name,model_id,group_id/id,operation,domain
+access_crm_ss_scoring_rule_manager,Scoring Rules: manager,crm.ss.scoring.rule,sales_team.group_sale_manager,crud,
+access_crm_ss_scoring_rule_user,Scoring Rules: salesman read,crm.ss.scoring.rule,sales_team.group_sale_salesman,r,
+crm_ss_scoring_rule_company,Scoring Rules: multi-company,crm.ss.scoring.rule,,crud,"[('company_id', 'in', company_ids + [False])]"
+access_crm_ss_assignment_rule_manager,Assignment Rules: manager,crm.ss.assignment.rule,sales_team.group_sale_manager,crud,
+access_crm_ss_assignment_rule_user,Assignment Rules: salesman read,crm.ss.assignment.rule,sales_team.group_sale_salesman,r,
+crm_ss_assignment_rule_company,Assignment Rules: multi-company,crm.ss.assignment.rule,,crud,"[('company_id', 'in', company_ids + [False])]"
+access_crm_ss_lead_convert,Convert Lead wizard,crm.ss.lead.convert,sales_team.group_sale_salesman,cru,
+access_crm_ss_mass_update,Mass Update wizard,crm.ss.mass.update,sales_team.group_sale_salesman,cru,
+access_crm_ss_log_call,Log a Call wizard,crm.ss.log.call,sales_team.group_sale_salesman,cru,

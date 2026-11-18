@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crm_stage_form_ss" model="ir.ui.view">
+        <field name="name">crm.stage.form.smart.sales</field>
+        <field name="model">crm.stage</field>
+        <field name="inherit_id" ref="crm.crm_stage_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='requirements']" position="after">
+                <separator string="Path: Key Fields &amp; Guidance for Success"/>
+                <group>
+                    <field name="ss_key_field_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                </group>
+                <field name="ss_guidance" placeholder="Tips displayed to sales reps when an opportunity is in this stage..."/>
+                <separator string="Stage-based Action"/>
+                <group>
+                    <group>
+                        <field name="ss_activity_type_id" placeholder="No automatic activity"/>
+                        <field name="ss_activity_summary" invisible="not ss_activity_type_id"/>
+                    </group>
+                    <group>
+                        <label for="ss_activity_days" invisible="not ss_activity_type_id"/>
+                        <div invisible="not ss_activity_type_id">
+                            <field name="ss_activity_days" class="oe_inline o_input_3ch"/> <span>days after entering the stage</span>
+                        </div>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="crm_stage_tree_ss" model="ir.ui.view">
+        <field name="name">crm.stage.list.smart.sales</field>
+        <field name="model">crm.stage</field>
+        <field name="inherit_id" ref="crm.crm_stage_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='is_won']" position="after">
+                <field name="ss_activity_type_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

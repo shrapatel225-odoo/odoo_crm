@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crm_ss_mass_update_view_form" model="ir.ui.view">
+        <field name="name">crm.ss.mass.update.form</field>
+        <field name="model">crm.ss.mass.update</field>
+        <field name="arch" type="xml">
+            <form string="Mass Update" class="o_ss_smart">
+                <field name="lead_ids" invisible="1"/>
+                <p class="text-muted"><field name="lead_count" class="oe_inline"/> record(s) selected.</p>
+                <group>
+                    <field name="operation" widget="radio"/>
+                    <field name="user_id" invisible="operation != 'owner'" required="operation == 'owner'" widget="many2one_avatar_user"/>
+                    <field name="team_id" invisible="operation not in ('owner', 'team')" required="operation == 'team'"/>
+                    <field name="notify" invisible="operation != 'owner'"/>
+                    <field name="ss_lead_status" invisible="operation != 'status'" required="operation == 'status'"/>
+                    <field name="ss_rating" invisible="operation != 'rating'" required="operation == 'rating'"/>
+                </group>
+                <p invisible="operation != 'rules'" class="text-muted">
+                    The active Lead Assignment Rules are applied to the selected records, including records that already have an owner.
+                </p>
+                <footer>
+                    <button name="action_apply" string="Apply" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="crm_ss_mass_update_action" model="ir.actions.act_window">
+        <field name="name">Mass Update</field>
+        <field name="res_model">crm.ss.mass.update</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="crm.model_crm_lead"/>
+        <field name="binding_view_types">list,kanban</field>
+    </record>
+</odoo>

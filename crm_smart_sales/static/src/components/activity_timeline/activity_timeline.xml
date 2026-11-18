@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="crm_smart_sales.ActivityTimeline">
+        <div class="o_ss_timeline">
+            <!-- Activity composer -->
+            <div class="o_ss_timeline_composer">
+                <button type="button" class="btn o_ss_composer_btn o_ss_kind_call" t-on-click="this.onLogCall" title="Log a Call">
+                    <i class="oi" data-icon="phone_in_talk"/><span>Log a Call</span>
+                </button>
+                <button type="button" class="btn o_ss_composer_btn o_ss_kind_email" t-on-click="this.onSendEmail" title="Email">
+                    <i class="oi" data-icon="mail"/><span>Email</span>
+                </button>
+                <button type="button" class="btn o_ss_composer_btn o_ss_kind_task" t-on-click="this.onNewTask" title="New Task">
+                    <i class="oi" data-icon="task"/><span>New Task</span>
+                </button>
+                <button type="button" class="btn o_ss_composer_btn o_ss_kind_meeting" t-on-click="this.onNewEvent" title="New Event">
+                    <i class="oi" data-icon="calendar_today"/><span>New Event</span>
+                </button>
+                <button type="button" class="btn o_ss_composer_btn o_ss_kind_note" t-on-click="this.onToggleNote" title="New Note">
+                    <i class="oi" data-icon="sticky_note_2"/><span>Note</span>
+                </button>
+            </div>
+            <div t-if="this.state.noteOpen" class="o_ss_timeline_note_editor">
+                <textarea class="form-control" rows="3" placeholder="Write an internal note..."
+                    t-att-value="this.state.noteBody" t-on-input="this.onNoteInput"/>
+                <div class="d-flex justify-content-end gap-2 mt-2">
+                    <button type="button" class="btn btn-secondary btn-sm" t-on-click="this.onToggleNote">Cancel</button>
+                    <button type="button" class="btn btn-primary btn-sm" t-on-click="this.onSaveNote">Save Note</button>
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="o_ss_timeline_toolbar">
+                <div class="o_ss_timeline_filters">
+                    <t t-foreach="this.filters" t-as="flt" t-key="flt.key">
+                        <button type="button" t-att-class="'btn btn-sm o_ss_filter_pill ' + (this.state.filter === flt.key ? 'active' : '')"
+                            t-on-click="() => this.setFilter(flt.key)" t-out="flt.label"/>
+                    </t>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-link btn-sm" t-on-click="this.refresh" title="Refresh">
+                        <i class="oi" data-icon="refresh"/>
+                    </button>
+                    <button type="button" class="btn btn-link btn-sm" t-on-click="this.toggleExpandAll">
+                        <t t-if="this.state.expandAll">Collapse All</t>
+                        <t t-else="">Expand All</t>
+                    </button>
+                </div>
+            </div>
+
+            <div t-if="!this.resId" class="o_ss_timeline_empty">Save the record to start logging activities.</div>
+            <div t-elif="this.state.loading" class="o_ss_timeline_empty"><i class="oi" data-icon="progress_activity"/> Loading...</div>
+            <t t-else="">
+                <!-- Upcoming & Overdue -->
+                <div class="o_ss_timeline_section">
+                    <div class="o_ss_timeline_section_title">Upcoming &amp; Overdue</div>
+                    <div t-if="!this.upcomingItems.length" class="o_ss_timeline_empty_small">No next steps. To get things moving, add a task or set up a meeting.</div>
+                    <t t-foreach="this.upcomingItems" t-as="item" t-key="this.itemKey(item)">
+                        <t t-call="crm_smart_sales.ActivityTimelineItem">
+                            <t t-set="upcoming" t-value="true"/>
+                        </t>
+                    </t>
+                </div>
+                <!-- Past activity by month -->
+                <t t-foreach="this.pastGroups" t-as="group" t-key="group.key">
+                    <div class="o_ss_timeline_section">
+                        <div class="o_ss_timeline_section_title" t-out="group.label"/>
+                        <t t-foreach="group.items" t-as="item" t-key="this.itemKey(item)">
+                            <t t-call="crm_smart_sales.ActivityTimelineItem">
+                                <t t-set="upcoming" t-value="false"/>
+                            </t>
+                        </t>
+                    </div>
+                </t>
+                <div t-if="!this.state.past.length" class="o_ss_timeline_empty_small">No past activity. Past meetings, calls, emails and tasks marked as done show up here.</div>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="crm_smart_sales.ActivityTimelineItem">
+        <div t-att-class="'o_ss_timeline_item o_ss_kind_' + item.kind + (item.overdue ? ' o_ss_overdue' : '')">
+            <div class="o_ss_timeline_icon"><i class="oi" t-att-data-icon="this.icon(item)"/></div>
+            <div class="o_ss_timeline_body">
+                <div class="o_ss_timeline_head">
+                    <button type="button" class="btn btn-link p-0 o_ss_timeline_expand" t-on-click="() => this.toggleItem(item)">
+                        <i class="oi" t-att-data-icon="this.isExpanded(item) ? 'expand_more' : 'chevron_right'"/>
+                    </button>
+                    <a href="#" class="o_ss_timeline_title text-truncate" t-on-click.prevent="() => this.onOpenItem(item)" t-out="item.title"/>
+                    <span t-if="item.incoming" class="badge text-bg-light ms-1">Received</span>
+                    <span t-att-class="'o_ss_timeline_date ms-auto' + (item.overdue ? ' text-danger fw-bold' : '')">
+                        <t t-if="item.overdue">Overdue · </t><t t-out="this.displayDate(item)"/>
+                    </span>
+                    <button t-if="upcoming and item.model === 'mail.activity'" type="button"
+                        class="btn btn-sm btn-outline-success o_ss_timeline_done ms-2"
+                        title="Mark as done" t-on-click="() => this.onMarkDone(item)">
+                        <i class="oi" data-icon="check"/>
+                    </button>
+                </div>
+                <div class="o_ss_timeline_sub">
+                    <span t-out="item.type_name"/>
+                    <t t-if="item.user"> · <span t-out="item.user"/></t>
+                </div>
+                <div t-if="this.isExpanded(item) and item.note" class="o_ss_timeline_note" t-out="this.noteMarkup(item)"/>
+            </div>
+        </div>
+    </t>
+
+</templates>

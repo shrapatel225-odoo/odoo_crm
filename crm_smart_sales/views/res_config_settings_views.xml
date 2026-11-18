@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_ss" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.crm.smart.sales</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="crm.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='crm']" position="inside">
+                <block title="Smart Sales CRM" name="crm_smart_sales">
+                    <setting string="Lead Assignment Rules"
+                        help="Assign new leads (web forms, emails, imports, API) with ordered, first-match rules.">
+                        <field name="ss_assignment_on_create"/>
+                        <div class="mt8">
+                            <button type="action" name="%(crm_smart_sales.crm_ss_assignment_rule_action)d"
+                                string="Assignment Rules" icon="east" class="btn-link"/>
+                        </div>
+                    </setting>
+                    <setting string="Lead Scoring &amp; Rating"
+                        help="Hot / Warm / Cold rating thresholds on the rule-based lead score (0-100).">
+                        <div class="row mt8">
+                            <label for="ss_rating_hot_threshold" class="col-lg-5 o_light_label"/>
+                            <field name="ss_rating_hot_threshold" class="col-lg-3"/>
+                        </div>
+                        <div class="row">
+                            <label for="ss_rating_warm_threshold" class="col-lg-5 o_light_label"/>
+                            <field name="ss_rating_warm_threshold" class="col-lg-3"/>
+                        </div>
+                        <div class="mt8">
+                            <button type="action" name="%(crm_smart_sales.crm_ss_scoring_rule_action)d"
+                                string="Scoring Rules" icon="east" class="btn-link"/>
+                        </div>
+                    </setting>
+                    <setting string="Duplicate Rule"
+                        help="Alert users about potential duplicates, or block creation of a lead with an email already used by an open lead.">
+                        <field name="ss_duplicate_rule" widget="radio"/>
+                    </setting>
+                    <setting string="Stale Lead Follow-up"
+                        help="Create a follow-up To-Do for the owner of New/Working leads without planned activity.">
+                        <field name="ss_followup_enabled"/>
+                        <div class="mt8" invisible="not ss_followup_enabled">
+                            <span>after </span><field name="ss_followup_days" class="oe_inline o_input_3ch"/><span> days without update</span>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

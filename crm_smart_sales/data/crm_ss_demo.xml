@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Path: key fields & guidance for success -->
+    <record id="crm.stage_lead1" model="crm.stage">
+        <field name="ss_guidance" type="html"><ul><li>Confirm the need and the decision maker within 48 hours.</li><li>Check if the account already exists to avoid duplicates.</li></ul></field>
+        <field name="ss_key_field_ids" eval="[(6, 0, [ref('crm.field_crm_lead__partner_id'), ref('crm.field_crm_lead__email_from'), ref('crm.field_crm_lead__phone')])]"/>
+        <field name="ss_activity_type_id" ref="mail.mail_activity_data_call"/>
+        <field name="ss_activity_summary">Discovery call</field>
+        <field name="ss_activity_days">1</field>
+    </record>
+    <record id="crm.stage_lead2" model="crm.stage">
+        <field name="ss_guidance" type="html"><ul><li>Identify budget, authority, need and timing (BANT).</li><li>Set an expected revenue and a closing date.</li></ul></field>
+        <field name="ss_key_field_ids" eval="[(6, 0, [ref('crm.field_crm_lead__expected_revenue'), ref('crm.field_crm_lead__date_deadline'), ref('crm.field_crm_lead__user_id')])]"/>
+    </record>
+    <record id="crm.stage_lead3" model="crm.stage">
+        <field name="ss_guidance" type="html"><ul><li>Send the proposal and plan a review meeting.</li><li>Confirm the decision process and competitors.</li></ul></field>
+        <field name="ss_key_field_ids" eval="[(6, 0, [ref('crm.field_crm_lead__expected_revenue'), ref('crm.field_crm_lead__probability'), ref('crm.field_crm_lead__date_deadline')])]"/>
+        <field name="ss_activity_type_id" ref="mail.mail_activity_data_meeting"/>
+        <field name="ss_activity_summary">Proposal review meeting</field>
+        <field name="ss_activity_days">3</field>
+    </record>
+
+    <!-- Assignment rules -->
+    <record id="ss_assignment_rule_big_deals" model="crm.ss.assignment.rule">
+        <field name="name">Big deals to the sales manager</field>
+        <field name="sequence">10</field>
+        <field name="lead_type">both</field>
+        <field name="domain">[("expected_revenue", "&gt;=", 50000)]</field>
+        <field name="assign_to">user</field>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="activity_type_id" ref="mail.mail_activity_data_call"/>
+        <field name="activity_summary">Call the prospect (big deal)</field>
+        <field name="activity_days">1</field>
+    </record>
+    <record id="ss_assignment_rule_round_robin" model="crm.ss.assignment.rule">
+        <field name="name">Inbound leads - round robin</field>
+        <field name="active" eval="False"/>
+        <field name="sequence">20</field>
+        <field name="lead_type">lead</field>
+        <field name="domain">[]</field>
+        <field name="assign_to">round_robin</field>
+        <field name="user_ids" eval="[(6, 0, [ref('base.user_admin'), ref('base.user_demo')])]"/>
+    </record>
+</odoo>

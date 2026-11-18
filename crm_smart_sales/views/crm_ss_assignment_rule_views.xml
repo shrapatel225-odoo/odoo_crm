@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crm_ss_assignment_rule_view_list" model="ir.ui.view">
+        <field name="name">crm.ss.assignment.rule.list</field>
+        <field name="model">crm.ss.assignment.rule</field>
+        <field name="arch" type="xml">
+            <list string="Lead Assignment Rules" class="o_ss_smart o_ss_list">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="lead_type"/>
+                <field name="assign_to"/>
+                <field name="user_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="user_ids" widget="many2many_avatar_user" optional="show"/>
+                <field name="team_id" optional="show"/>
+                <field name="assigned_count"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="crm_ss_assignment_rule_view_form" model="ir.ui.view">
+        <field name="name">crm.ss.assignment.rule.form</field>
+        <field name="model">crm.ss.assignment.rule</field>
+        <field name="arch" type="xml">
+            <form string="Lead Assignment Rule" class="o_ss_smart">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Benelux leads to the Benelux team"/></h1>
+                    </div>
+                    <group>
+                        <group string="Rule Entry">
+                            <field name="active" invisible="1"/>
+                            <field name="sequence"/>
+                            <field name="lead_type" widget="radio"/>
+                            <field name="company_id" groups="base.group_multi_company" placeholder="All companies"/>
+                            <field name="override_owner"/>
+                        </group>
+                        <group string="Assign To">
+                            <field name="assign_to" widget="radio"/>
+                            <field name="user_id" invisible="assign_to != 'user'" required="assign_to == 'user'"
+                                widget="many2one_avatar_user"/>
+                            <field name="user_ids" invisible="assign_to != 'round_robin'"
+                                required="assign_to == 'round_robin'" widget="many2many_avatar_user"/>
+                            <field name="team_id" required="assign_to == 'team_load'"/>
+                            <field name="last_user_id" invisible="assign_to != 'round_robin' or not last_user_id"/>
+                            <field name="notify_owner"/>
+                        </group>
+                    </group>
+                    <separator string="Criteria"/>
+                    <field name="domain" widget="domain" options="{'model': 'crm.lead', 'in_dialog': true}"/>
+                    <group>
+                        <group string="Follow-up Activity">
+                            <field name="activity_type_id" placeholder="No activity"/>
+                            <field name="activity_summary" invisible="not activity_type_id"/>
+                            <field name="activity_days" invisible="not activity_type_id"/>
+                        </group>
+                        <group string="Statistics">
+                            <field name="assigned_count"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="crm_ss_assignment_rule_view_search" model="ir.ui.view">
+        <field name="name">crm.ss.assignment.rule.search</field>
+        <field name="model">crm.ss.assignment.rule</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="team_id"/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="crm_ss_assignment_rule_action" model="ir.actions.act_window">
+        <field name="name">Lead Assignment Rules</field>
+        <field name="res_model">crm.ss.assignment.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first assignment rule entry</p>
+            <p>Rules are evaluated in sequence; the first rule whose criteria match a new lead assigns it to a user,
+               to users in round robin, or to the least loaded member of a sales team.</p>
+        </field>
+    </record>
+</odoo>

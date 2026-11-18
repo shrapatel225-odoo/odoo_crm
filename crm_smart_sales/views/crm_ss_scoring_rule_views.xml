@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crm_ss_scoring_rule_view_list" model="ir.ui.view">
+        <field name="name">crm.ss.scoring.rule.list</field>
+        <field name="model">crm.ss.scoring.rule</field>
+        <field name="arch" type="xml">
+            <list string="Lead Scoring Rules" class="o_ss_smart o_ss_list">
+                <header>
+                    <button name="action_recompute_all_scores" type="object" string="Recalculate All Scores"
+                        class="btn-primary" display="always"/>
+                </header>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="category" widget="badge"
+                    decoration-success="category == 'fit'" decoration-info="category == 'engagement'"
+                    decoration-warning="category == 'value'" decoration-danger="category == 'negative'"/>
+                <field name="domain" widget="domain" options="{'model': 'crm.lead'}" optional="hide"/>
+                <field name="points"/>
+                <field name="matching_count" string="Open Matches"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="crm_ss_scoring_rule_view_form" model="ir.ui.view">
+        <field name="name">crm.ss.scoring.rule.form</field>
+        <field name="model">crm.ss.scoring.rule</field>
+        <field name="arch" type="xml">
+            <form string="Lead Scoring Rule" class="o_ss_smart">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_matching_leads" type="object" class="oe_stat_button" icon="filter_alt">
+                            <field name="matching_count" widget="statinfo" string="Open Matches"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Decision maker title"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="category"/>
+                            <field name="points"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company" placeholder="All companies"/>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                    <separator string="Condition"/>
+                    <field name="domain" widget="domain" options="{'model': 'crm.lead', 'in_dialog': true}"/>
+                    <separator string="Description"/>
+                    <field name="description" placeholder="Why this criterion matters..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="crm_ss_scoring_rule_view_search" model="ir.ui.view">
+        <field name="name">crm.ss.scoring.rule.search</field>
+        <field name="model">crm.ss.scoring.rule</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="groupby_category" string="Category" context="{'group_by': 'category'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="crm_ss_scoring_rule_action" model="ir.actions.act_window">
+        <field name="name">Lead Scoring Rules</field>
+        <field name="res_model">crm.ss.scoring.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a lead scoring rule</p>
+            <p>Each rule adds or removes points when a lead matches its condition.
+               The total (0-100) gives the Lead Score and the Hot / Warm / Cold rating.</p>
+        </field>
+    </record>
+</odoo>

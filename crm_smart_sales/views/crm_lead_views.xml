@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =============================================================
+         RECORD PAGE
+         ============================================================= -->
+    <record id="crm_lead_view_form_ss" model="ir.ui.view">
+        <field name="name">crm.lead.form.smart.sales</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="priority">50</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="class" add="o_ss_smart o_ss_record_page" separator=" "/>
+            </xpath>
+
+            <!-- Header: Convert + Lead path -->
+            <xpath expr="//header/button[@name='action_convert_to_opportunity']" position="before">
+                <button name="action_ss_open_convert_wizard" string="Convert" type="object"
+                    class="btn-primary o_ss_btn_convert" data-hotkey="c"
+                    invisible="type == 'opportunity' or not active"/>
+            </xpath>
+            <xpath expr="//header/button[@name='action_convert_to_opportunity']" position="attributes">
+                <attribute name="string">Quick Convert</attribute>
+                <attribute name="class">btn-secondary</attribute>
+            </xpath>
+            <xpath expr="//header/field[@name='stage_id']" position="before">
+                <field name="ss_lead_status" widget="statusbar" options="{'clickable': '1'}"
+                    statusbar_visible="new,working,nurturing,qualified,converted"
+                    invisible="type == 'opportunity'" readonly="not active"/>
+            </xpath>
+
+            <!-- Duplicate alert + highlights panel + path assistant -->
+            <xpath expr="//div[hasclass('oe_title')]/parent::div" position="before">
+                <div class="alert alert-warning d-flex align-items-center gap-2 o_ss_duplicate_alert" role="alert"
+                    invisible="not ss_duplicate_message">
+                    <i class="oi" data-icon="warning" title="Warning"/>
+                    <field name="ss_duplicate_message" class="flex-grow-1" readonly="1"/>
+                    <button name="action_show_potential_duplicates" type="object" string="View Duplicates"
+                        class="btn btn-sm btn-link"/>
+                </div>
+            </xpath>
+            <xpath expr="//div[hasclass('oe_title')]/parent::div" position="after">
+                <div class="o_ss_highlights" invisible="not id">
+                    <div class="o_ss_highlight">
+                        <span class="o_ss_highlight_label">Type</span>
+                        <field name="type" widget="badge" decoration-info="type == 'lead'" decoration-success="type == 'opportunity'" readonly="1"/>
+                    </div>
+                    <div class="o_ss_highlight" invisible="type == 'opportunity'">
+                        <span class="o_ss_highlight_label">Lead Status</span>
+                        <field name="ss_lead_status" widget="badge" readonly="1"
+                            decoration-info="ss_lead_status in ('new', 'working', 'nurturing')"
+                            decoration-success="ss_lead_status in ('qualified', 'converted')"
+                            decoration-danger="ss_lead_status == 'unqualified'"/>
+                    </div>
+                    <div class="o_ss_highlight">
+                        <span class="o_ss_highlight_label">Rating</span>
+                        <field name="ss_rating" widget="badge" readonly="1"
+                            decoration-danger="ss_rating == 'hot'"
+                            decoration-warning="ss_rating == 'warm'"
+                            decoration-info="ss_rating == 'cold'"/>
+                    </div>
+                    <div class="o_ss_highlight o_ss_highlight_score">
+                        <span class="o_ss_highlight_label">Lead Score</span>
+                        <field name="ss_score" widget="progressbar" readonly="1"/>
+                    </div>
+                    <div class="o_ss_highlight">
+                        <span class="o_ss_highlight_label">Owner</span>
+                        <field name="user_id" widget="many2one_avatar_user" readonly="1"/>
+                    </div>
+                    <div class="o_ss_highlight" invisible="not partner_name">
+                        <span class="o_ss_highlight_label">Company</span>
+                        <field name="partner_name" readonly="1"/>
+                    </div>
+                    <div class="o_ss_highlight" invisible="not phone">
+                        <span class="o_ss_highlight_label">Phone</span>
+                        <field name="phone" widget="phone" readonly="1"/>
+                    </div>
+                    <div class="o_ss_highlight" invisible="not email_from">
+                        <span class="o_ss_highlight_label">Email</span>
+                        <field name="email_from" widget="email" readonly="1"/>
+                    </div>
+                    <div class="o_ss_highlight">
+                        <span class="o_ss_highlight_label">Last Activity</span>
+                        <field name="ss_last_activity_date" readonly="1"/>
+                        <span class="text-muted" invisible="ss_last_activity_date">None</span>
+                    </div>
+                </div>
+                <div class="o_ss_path_assistant" invisible="type == 'lead' or not ss_has_path_info">
+                    <div class="o_ss_path_assistant_col">
+                        <div class="o_ss_path_assistant_title">Key Fields</div>
+                        <field name="ss_key_fields_html" readonly="1" nolabel="1"/>
+                    </div>
+                    <div class="o_ss_path_assistant_col">
+                        <div class="o_ss_path_assistant_title">Guidance for Success</div>
+                        <field name="ss_guidance" readonly="1" nolabel="1"/>
+                    </div>
+                </div>
+            </xpath>
+
+            <!-- Rating next to priority -->
+            <xpath expr="//field[@name='tag_ids']" position="after">
+                <field name="ss_rating" widget="badges_selection" options="{'horizontal': true}"/>
+            </xpath>
+
+            <!-- Tabs: Activity / Details / Lead Score -->
+            <xpath expr="//notebook/page[@name='internal_notes']" position="before">
+                <page string="Activity" name="ss_activity">
+                    <widget name="ss_activity_timeline"/>
+                </page>
+                <page string="Details" name="ss_details">
+                    <group>
+                        <group string="Lead Information" name="ss_lead_information">
+                            <field name="contact_name"/>
+                            <field name="partner_name" string="Company"/>
+                            <field name="function"/>
+                            <field name="website" widget="url"/>
+                            <field name="source_id"/>
+                            <field name="campaign_id" options="{'create_name_field': 'title'}"/>
+                            <field name="medium_id"/>
+                            <field name="expected_revenue" widget="monetary" options="{'currency_field': 'company_currency'}"/>
+                            <field name="team_id" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Address Information" name="ss_address_information">
+                            <field name="street"/>
+                            <field name="street2"/>
+                            <field name="city"/>
+                            <field name="state_id" options="{'no_open': True}"/>
+                            <field name="zip"/>
+                            <field name="country_id" options="{'no_open': True, 'no_create': True}"/>
+                        </group>
+                        <group string="System Information" name="ss_system_information">
+                            <field name="create_date" string="Created On" readonly="1"/>
+                            <field name="create_uid" string="Created By" readonly="1"/>
+                            <field name="write_date" string="Last Modified On" readonly="1"/>
+                            <field name="ss_status_date" readonly="1" invisible="type == 'opportunity'"/>
+                            <field name="date_conversion" readonly="1" invisible="not date_conversion"/>
+                            <field name="ss_assignment_rule_id" readonly="1" invisible="not ss_assignment_rule_id"/>
+                            <field name="ss_age_days" readonly="1"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Lead Score" name="ss_score">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <span class="text-muted me-2">Rule-based score</span>
+                            <field name="ss_score" widget="progressbar" class="d-inline-block w-auto" readonly="1"/>
+                        </div>
+                        <button name="action_ss_recompute_score" type="object" string="Recalculate"
+                            class="btn btn-secondary btn-sm" icon="refresh"/>
+                    </div>
+                    <field name="ss_score_breakdown" readonly="1" nolabel="1"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- =============================================================
+         PIPELINE KANBAN (opportunities)
+         ============================================================= -->
+    <record id="crm_case_kanban_view_leads_ss" model="ir.ui.view">
+        <field name="name">crm.lead.kanban.lead.smart.sales</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+        <field name="priority">50</field>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="class" add="o_ss_smart o_ss_kanban" separator=" "/>
+            </xpath>
+            <xpath expr="//t[@t-name='card']/field[@name='name']" position="after">
+                <div class="o_ss_card_meta">
+                    <span class="o_ss_card_company text-truncate" invisible="not partner_name">
+                        <i class="oi" data-icon="business" title="Company"/> <field name="partner_name"/>
+                    </span>
+                    <field name="ss_rating" widget="badge" class="ms-auto o_ss_rating_badge"
+                        decoration-danger="ss_rating == 'hot'" decoration-warning="ss_rating == 'warm'"
+                        decoration-info="ss_rating == 'cold'"/>
+                </div>
+            </xpath>
+            <xpath expr="//t[@t-name='card']/field[@name='tag_ids']" position="before">
+                <div class="o_ss_card_contact">
+                    <span class="text-truncate" invisible="not email_from"><i class="oi" data-icon="mail" title="Email"/> <field name="email_from"/></span>
+                    <span class="text-truncate" invisible="not phone"><i class="oi" data-icon="phone" title="Phone"/> <field name="phone"/></span>
+                    <span class="text-truncate" invisible="not source_id"><i class="oi" data-icon="campaign" title="Source"/> <field name="source_id"/></span>
+                </div>
+                <div class="o_ss_card_next" invisible="not activity_date_deadline">
+                    <i class="oi" data-icon="event_upcoming" title="Next Activity"/>
+                    <span>Next:</span>
+                    <field name="activity_summary" class="text-truncate"/>
+                    <field name="activity_date_deadline" widget="relative_date" class="ms-auto"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- =============================================================
+         LEAD KANBAN (grouped by Lead Status)
+         ============================================================= -->
+    <record id="view_crm_lead_kanban_ss" model="ir.ui.view">
+        <field name="name">crm.lead.kanban.smart.sales</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.view_crm_lead_kanban"/>
+        <field name="priority">50</field>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="class" add="o_ss_smart o_ss_kanban o_ss_lead_kanban" separator=" "/>
+                <attribute name="default_group_by">ss_lead_status</attribute>
+                <attribute name="on_create">quick_create</attribute>
+                <attribute name="quick_create_view">crm_smart_sales.crm_lead_view_form_ss_quick_create</attribute>
+            </xpath>
+            <xpath expr="//progressbar" position="attributes">
+                <attribute name="sum_field">expected_revenue</attribute>
+            </xpath>
+            <xpath expr="//t[@t-name='card']/field[@name='name']" position="after">
+                <div class="o_ss_card_meta">
+                    <span class="o_ss_card_company text-truncate" invisible="not partner_name">
+                        <i class="oi" data-icon="business" title="Company"/> <field name="partner_name"/>
+                    </span>
+                    <field name="ss_rating" widget="badge" class="ms-auto o_ss_rating_badge"
+                        decoration-danger="ss_rating == 'hot'" decoration-warning="ss_rating == 'warm'"
+                        decoration-info="ss_rating == 'cold'"/>
+                </div>
+            </xpath>
+            <xpath expr="//t[@t-name='card']/field[@name='contact_name']" position="replace">
+                <div class="o_ss_card_contact">
+                    <span class="text-truncate" invisible="not contact_name"><i class="oi" data-icon="person" title="Contact"/> <field name="contact_name"/></span>
+                    <span class="text-truncate" invisible="not email_from"><i class="oi" data-icon="mail" title="Email"/> <field name="email_from"/></span>
+                    <span class="text-truncate" invisible="not phone"><i class="oi" data-icon="phone" title="Phone"/> <field name="phone"/></span>
+                    <span class="text-truncate" invisible="not source_id"><i class="oi" data-icon="campaign" title="Source"/> <field name="source_id"/></span>
+                </div>
+                <div class="o_ss_card_values">
+                    <field name="company_currency" invisible="1"/>
+                    <span invisible="not expected_revenue"><field name="expected_revenue" widget="monetary" options="{'currency_field': 'company_currency'}"/></span>
+                    <span class="o_ss_card_score" title="Lead Score">
+                        <i class="oi" data-icon="speed" title="Lead Score"/> <field name="ss_score"/>
+                    </span>
+                    <span class="text-muted ms-auto" title="Created on">
+                        <field name="create_date" widget="date"/>
+                    </span>
+                </div>
+                <div class="o_ss_card_next" invisible="not activity_date_deadline">
+                    <i class="oi" data-icon="event_upcoming" title="Next Activity"/>
+                    <span>Next:</span>
+                    <field name="activity_summary" class="text-truncate"/>
+                    <field name="activity_date_deadline" widget="relative_date" class="ms-auto"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- quick create for the lead kanban -->
+    <record id="crm_lead_view_form_ss_quick_create" model="ir.ui.view">
+        <field name="name">crm.lead.form.quick_create.smart.sales</field>
+        <field name="model">crm.lead</field>
+        <field name="priority">1000</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="type" invisible="1"/>
+                    <field name="name" string="Lead" placeholder="e.g. Website enquiry"/>
+                    <field name="partner_name" string="Company"/>
+                    <field name="contact_name"/>
+                    <field name="email_from" widget="email"/>
+                    <field name="phone" widget="phone"/>
+                    <field name="source_id"/>
+                    <field name="expected_revenue"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- =============================================================
+         LIST VIEWS
+         ============================================================= -->
+    <record id="crm_case_tree_view_leads_ss" model="ir.ui.view">
+        <field name="name">crm.lead.list.lead.smart.sales</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_leads"/>
+        <field name="priority">50</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="class" add="o_ss_smart o_ss_list" separator=" "/>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_ss_mass_change_owner" type="object" string="Change Owner"/>
+                <button name="action_ss_mass_change_status" type="object" string="Change Status"/>
+                <button name="action_ss_run_assignment_rules" type="object" string="Run Assignment Rules"/>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="ss_lead_status" widget="badge" optional="show"
+                    decoration-info="ss_lead_status in ('new', 'working', 'nurturing')"
+                    decoration-success="ss_lead_status in ('qualified', 'converted')"
+                    decoration-danger="ss_lead_status == 'unqualified'"/>
+                <field name="ss_rating" widget="badge" optional="show"
+                    decoration-danger="ss_rating == 'hot'" decoration-warning="ss_rating == 'warm'"
+                    decoration-info="ss_rating == 'cold'"/>
+                <field name="ss_score" widget="progressbar" optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_name']" position="attributes">
+                <attribute name="optional">show</attribute>
+                <attribute name="string">Company</attribute>
+            </xpath>
+            <xpath expr="//field[@name='phone']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='create_date']" position="attributes">
+                <attribute name="optional">show</attribute>
+                <attribute name="widget">date</attribute>
+            </xpath>
+            <xpath expr="//field[@name='priority']" position="after">
+                <field name="activity_ids" optional="show" widget="list_activity"/>
+                <field name="expected_revenue" optional="hide" sum="Expected Revenue" widget="monetary"
+                    options="{'currency_field': 'company_currency'}"/>
+                <field name="company_currency" column_invisible="True"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="crm_case_tree_view_oppor_ss" model="ir.ui.view">
+        <field name="name">crm.lead.list.opportunity.smart.sales</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_oppor"/>
+        <field name="priority">50</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="class" add="o_ss_smart o_ss_list" separator=" "/>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_ss_mass_change_owner" type="object" string="Change Owner"/>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="ss_rating" widget="badge" optional="show"
+                    decoration-danger="ss_rating == 'hot'" decoration-warning="ss_rating == 'warm'"
+                    decoration-info="ss_rating == 'cold'"/>
+                <field name="ss_score" widget="progressbar" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- =============================================================
+         SEARCH (predefined list views)
+         ============================================================= -->
+    <record id="view_crm_case_leads_filter_ss" model="ir.ui.view">
+        <field name="name">crm.lead.search.lead.smart.sales</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.view_crm_case_leads_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tag_ids']" position="after">
+                <field name="ss_lead_status"/>
+                <field name="ss_rating"/>
+            </xpath>
+            <xpath expr="//filter[@name='assigned_to_me']" position="before">
+                <filter string="My Open Leads" name="ss_my_open_leads"
+                    domain="[('user_id', '=', uid), ('ss_lead_status', 'not in', ('converted', 'unqualified'))]"/>
+                <filter string="All Open Leads" name="ss_all_open_leads"
+                    domain="[('ss_lead_status', 'not in', ('converted', 'unqualified'))]"/>
+                <filter string="Today's Leads" name="ss_todays_leads"
+                    domain="[('create_date', '&gt;=', 'today')]"/>
+                <separator/>
+            </xpath>
+            <xpath expr="//filter[@name='unassigned_leads']" position="after">
+                <separator/>
+                <filter string="Hot" name="ss_hot" domain="[('ss_rating', '=', 'hot')]"/>
+                <filter string="Warm" name="ss_warm" domain="[('ss_rating', '=', 'warm')]"/>
+                <filter string="Cold" name="ss_cold" domain="[('ss_rating', '=', 'cold')]"/>
+                <separator/>
+                <filter string="New" name="ss_status_new" domain="[('ss_lead_status', '=', 'new')]"/>
+                <filter string="Working" name="ss_status_working" domain="[('ss_lead_status', '=', 'working')]"/>
+                <filter string="Nurturing" name="ss_status_nurturing" domain="[('ss_lead_status', '=', 'nurturing')]"/>
+                <filter string="Qualified" name="ss_status_qualified" domain="[('ss_lead_status', '=', 'qualified')]"/>
+            </xpath>
+            <xpath expr="//filter[@name='salesperson']" position="before">
+                <filter string="Lead Status" name="ss_groupby_status" context="{'group_by': 'ss_lead_status'}"/>
+                <filter string="Rating" name="ss_groupby_rating" context="{'group_by': 'ss_rating'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_crm_case_opportunities_filter_ss" model="ir.ui.view">
+        <field name="name">crm.lead.search.opportunity.smart.sales</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="ss_rating"/>
+                <separator/>
+                <filter string="Hot" name="ss_hot" domain="[('ss_rating', '=', 'hot')]"/>
+                <filter string="Warm" name="ss_warm" domain="[('ss_rating', '=', 'warm')]"/>
+                <filter string="Cold" name="ss_cold" domain="[('ss_rating', '=', 'cold')]"/>
+                <group>
+                    <filter string="Rating" name="ss_groupby_rating" context="{'group_by': 'ss_rating'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="crm_ss_menu_dashboard"
+        name="Dashboard"
+        parent="crm.crm_menu_root"
+        action="crm_ss_dashboard_action"
+        groups="sales_team.group_sale_salesman"
+        sequence="0"/>
+    <menuitem id="crm_ss_menu_report_dashboard"
+        name="Sales Dashboard"
+        parent="crm.crm_menu_report"
+        action="crm_ss_dashboard_action"
+        sequence="0"/>
+    <menuitem id="crm_ss_menu_config_rules"
+        name="Lead Rules"
+        parent="crm.crm_menu_config"
+        sequence="7"
+        groups="sales_team.group_sale_manager"/>
+    <menuitem id="crm_ss_menu_assignment_rules"
+        name="Assignment Rules"
+        parent="crm_ss_menu_config_rules"
+        action="crm_ss_assignment_rule_action"
+        sequence="1"/>
+    <menuitem id="crm_ss_menu_scoring_rules"
+        name="Scoring Rules"
+        parent="crm_ss_menu_config_rules"
+        action="crm_ss_scoring_rule_action"
+        sequence="2"/>
+</odoo>

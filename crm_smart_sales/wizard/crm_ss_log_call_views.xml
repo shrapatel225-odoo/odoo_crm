@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crm_ss_log_call_view_form" model="ir.ui.view">
+        <field name="name">crm.ss.log.call.form</field>
+        <field name="model">crm.ss.log.call</field>
+        <field name="arch" type="xml">
+            <form string="Log a Call" class="o_ss_smart">
+                <field name="lead_id" invisible="1"/>
+                <group>
+                    <field name="summary"/>
+                    <field name="outcome" widget="radio" options="{'horizontal': true}"/>
+                    <field name="comments" placeholder="What was discussed?"/>
+                    <field name="schedule_follow_up"/>
+                    <field name="follow_up_date" invisible="not schedule_follow_up" required="schedule_follow_up"/>
+                    <field name="follow_up_summary" invisible="not schedule_follow_up" placeholder="Follow-up call"/>
+                </group>
+                <footer>
+                    <button name="action_log_call" string="Save" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

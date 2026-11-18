@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="crm_smart_sales.ChartCard">
+        <div class="o_ss_card o_ss_chart_card">
+            <div class="o_ss_card_header">
+                <div>
+                    <div class="o_ss_card_title" t-out="this.props.title"/>
+                    <div t-if="this.props.subtitle" class="o_ss_card_subtitle" t-out="this.props.subtitle"/>
+                </div>
+            </div>
+            <div t-if="this.props.empty" class="o_ss_chart_empty">
+                <i class="oi" data-icon="bar_chart"/>
+                <span>No data for the selected filters</span>
+            </div>
+            <div t-else="" class="o_ss_chart_canvas" t-attf-style="height: {{ this.props.height or 260 }}px;">
+                <canvas t-ref="this.chart.ref"/>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="crm_smart_sales.Dashboard">
+        <div class="o_action o_ss_smart o_ss_dashboard">
+            <Layout display="{ controlPanel: {} }">
+                <t t-set-slot="control-panel-buttons">
+                    <button class="btn btn-primary" t-on-click="() => this.loadData()">
+                        <i class="oi" data-icon="refresh"/> Refresh
+                    </button>
+                </t>
+                <div class="o_ss_dashboard_content">
+                    <!-- Filters -->
+                    <div class="o_ss_card o_ss_filter_bar" t-if="this.state.options">
+                        <div class="o_ss_filter">
+                            <label>Date Range</label>
+                            <select class="form-select form-select-sm" t-on-change="this.onPresetChange">
+                                <t t-foreach="this.presets" t-as="preset" t-key="preset.key">
+                                    <option t-att-value="preset.key" t-att-selected="preset.key === this.state.preset" t-out="preset.label"/>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="o_ss_filter">
+                            <label>From</label>
+                            <input type="date" class="form-control form-control-sm" t-att-value="this.state.dateFrom"
+                                t-on-change="(ev) => this.onDateChange('dateFrom', ev)"/>
+                        </div>
+                        <div class="o_ss_filter">
+                            <label>To</label>
+                            <input type="date" class="form-control form-control-sm" t-att-value="this.state.dateTo"
+                                t-on-change="(ev) => this.onDateChange('dateTo', ev)"/>
+                        </div>
+                        <div class="o_ss_filter" t-if="this.state.options.is_manager">
+                            <label>Salesperson</label>
+                            <select class="form-select form-select-sm" t-on-change="(ev) => this.onSelectChange('userId', ev)">
+                                <option value="">All</option>
+                                <t t-foreach="this.state.options.users" t-as="opt" t-key="opt.id">
+                                    <option t-att-value="opt.id" t-att-selected="this.isSelected('userId', opt.id)" t-out="opt.name"/>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="o_ss_filter">
+                            <label>Sales Team</label>
+                            <select class="form-select form-select-sm" t-on-change="(ev) => this.onSelectChange('teamId', ev)">
+                                <option value="">All</option>
+                                <t t-foreach="this.state.options.teams" t-as="opt" t-key="opt.id">
+                                    <option t-att-value="opt.id" t-att-selected="this.isSelected('teamId', opt.id)" t-out="opt.name"/>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="o_ss_filter">
+                            <label>Lead Source</label>
+                            <select class="form-select form-select-sm" t-on-change="(ev) => this.onSelectChange('sourceId', ev)">
+                                <option value="">All</option>
+                                <t t-foreach="this.state.options.sources" t-as="opt" t-key="opt.id">
+                                    <option t-att-value="opt.id" t-att-selected="this.isSelected('sourceId', opt.id)" t-out="opt.name"/>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="o_ss_filter">
+                            <label>Lead Status</label>
+                            <select class="form-select form-select-sm" t-on-change="(ev) => this.onSelectChange('status', ev)">
+                                <option value="">All</option>
+                                <t t-foreach="this.state.options.statuses" t-as="opt" t-key="opt.id">
+                                    <option t-att-value="opt.id" t-att-selected="this.isSelected('status', opt.id)" t-out="opt.name"/>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="o_ss_filter" t-if="this.state.options.multi_company">
+                            <label>Company</label>
+                            <select class="form-select form-select-sm" t-on-change="(ev) => this.onSelectChange('companyId', ev)">
+                                <option value="">All</option>
+                                <t t-foreach="this.state.options.companies" t-as="opt" t-key="opt.id">
+                                    <option t-att-value="opt.id" t-att-selected="this.isSelected('companyId', opt.id)" t-out="opt.name"/>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="o_ss_filter o_ss_filter_reset">
+                            <button class="btn btn-link btn-sm" t-on-click="() => this.onResetFilters()">Reset</button>
+                        </div>
+                    </div>
+
+                    <div t-if="!this.state.data" class="o_ss_dashboard_loading">
+                        <i class="oi" data-icon="progress_activity"/> Loading...
+                    </div>
+                    <t t-else="">
+                        <div t-att-class="'o_ss_dashboard_body' + (this.state.loading ? ' o_ss_is_loading' : '')">
+                            <!-- KPI cards -->
+                            <div class="o_ss_kpi_grid">
+                                <t t-foreach="this.kpiCards" t-as="card" t-key="card.label">
+                                    <button type="button" t-att-class="'o_ss_kpi o_ss_kpi_' + card.color" t-on-click="() => this.onKpiClick(card)">
+                                        <div class="o_ss_kpi_icon"><i class="oi" t-att-data-icon="card.icon"/></div>
+                                        <div class="o_ss_kpi_text">
+                                            <div class="o_ss_kpi_label" t-out="card.label"/>
+                                            <div class="o_ss_kpi_value" t-out="card.value"/>
+                                            <div t-if="card.sub" class="o_ss_kpi_sub" t-out="card.sub"/>
+                                        </div>
+                                    </button>
+                                </t>
+                            </div>
+                            <div class="o_ss_kpi_strip">
+                                <t t-foreach="this.secondaryKpis" t-as="kpi" t-key="kpi.label">
+                                    <button type="button" class="o_ss_kpi_mini" t-on-click="() => this.openDrilldown(kpi.key)">
+                                        <span class="o_ss_kpi_mini_label" t-out="kpi.label"/>
+                                        <span class="o_ss_kpi_mini_value" t-out="kpi.value"/>
+                                    </button>
+                                </t>
+                            </div>
+
+                            <!-- Charts -->
+                            <div class="o_ss_chart_grid">
+                                <SsChartCard title="this.labels.pipeline" subtitle="this.labels.pipelineSub"
+                                    config="this.pipelineConfig" empty="!this.charts.pipeline_by_stage.length"
+                                    onPointClick="this.drill('pipeline_by_stage', 'open_pipeline', 'stage_id')"/>
+                                <SsChartCard title="this.labels.forecast" subtitle="this.labels.forecastSub"
+                                    config="this.forecastConfig" empty="!this.charts.revenue_forecast.length"/>
+                                <SsChartCard title="this.labels.monthly" subtitle="this.labels.monthlySub"
+                                    config="this.monthlyConfig" empty="!this.charts.monthly.length"/>
+                                <SsChartCard title="this.labels.trend" subtitle="this.labels.trendSub"
+                                    config="this.conversionTrendConfig" empty="!this.charts.monthly.length"/>
+                                <SsChartCard title="this.labels.bySource" config="this.leadsBySourceConfig"
+                                    empty="!this.charts.leads_by_source.length"
+                                    onPointClick="this.drill('leads_by_source', 'total_leads', 'source_id')"/>
+                                <SsChartCard title="this.labels.byUser" config="this.leadsByUserConfig"
+                                    empty="!this.charts.leads_by_user.length"
+                                    onPointClick="this.drill('leads_by_user', 'total_leads', 'user_id')"/>
+                                <SsChartCard title="this.labels.byStatus" config="this.leadsByStatusConfig"
+                                    empty="!this.charts.leads_by_status.length"
+                                    onPointClick="this.drill('leads_by_status', 'total_leads', 'ss_lead_status')"/>
+                                <SsChartCard title="this.labels.byRating" config="this.leadsByRatingConfig"
+                                    empty="!this.charts.leads_by_rating.length"
+                                    onPointClick="this.drill('leads_by_rating', 'total_leads', 'ss_rating')"/>
+                                <SsChartCard title="this.labels.performance" subtitle="this.labels.performanceSub"
+                                    config="this.performanceConfig" empty="!this.state.data.leaderboard.length"/>
+                                <SsChartCard title="this.labels.lost" subtitle="this.labels.lostSub"
+                                    config="this.lostReasonsConfig" empty="!this.charts.lost_reasons.length"
+                                    onPointClick="this.drill('lost_reasons', 'lost', 'lost_reason_id')"/>
+                            </div>
+
+                            <!-- Leaderboard -->
+                            <div class="o_ss_card">
+                                <div class="o_ss_card_header">
+                                    <div class="o_ss_card_title">Sales Team Performance</div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover o_ss_table mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Salesperson</th>
+                                                <th class="text-end">Leads</th>
+                                                <th class="text-end">Converted</th>
+                                                <th class="text-end">Conversion</th>
+                                                <th class="text-end">Opportunities</th>
+                                                <th class="text-end">Won</th>
+                                                <th class="text-end">Lost</th>
+                                                <th class="text-end">Win Rate</th>
+                                                <th class="text-end">Won Revenue</th>
+                                                <th class="text-end">Open Pipeline</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr t-if="!this.state.data.leaderboard.length">
+                                                <td colspan="10" class="text-center text-muted">No data for the selected filters</td>
+                                            </tr>
+                                            <t t-foreach="this.state.data.leaderboard" t-as="row" t-key="row.name">
+                                                <tr class="o_ss_clickable" t-on-click="() => this.onLeaderClick(row)">
+                                                    <td class="fw-bold" t-out="row.name"/>
+                                                    <td class="text-end" t-out="row.leads"/>
+                                                    <td class="text-end" t-out="row.converted"/>
+                                                    <td class="text-end"><t t-out="row.conversion_rate"/>%</td>
+                                                    <td class="text-end" t-out="row.opportunities"/>
+                                                    <td class="text-end text-success" t-out="row.won"/>
+                                                    <td class="text-end text-danger" t-out="row.lost"/>
+                                                    <td class="text-end">
+                                                        <div class="o_ss_rate_bar"><span t-attf-style="width: {{ row.win_rate }}%"/></div>
+                                                        <t t-out="row.win_rate"/>%
+                                                    </td>
+                                                    <td class="text-end" t-out="this.money(row.won_revenue, false)"/>
+                                                    <td class="text-end" t-out="this.money(row.pipeline, false)"/>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </Layout>
+        </div>
+    </t>
+
+</templates>

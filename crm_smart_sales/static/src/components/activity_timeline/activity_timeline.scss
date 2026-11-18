@@ -1,0 +1,168 @@
+.o_ss_timeline {
+    --ss-tl-call: #48c3cc;
+    --ss-tl-email: #939393;
+    --ss-tl-task: #3ba755;
+    --ss-tl-meeting: #cb65ff;
+    --ss-tl-note: #e6d478;
+    padding: 0.25rem 0 0.5rem;
+
+    .o_ss_timeline_composer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--bs-border-color, #e5e5e5);
+    }
+    .o_ss_composer_btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        border: 1px solid var(--bs-border-color, #c9c9c9);
+        border-radius: 0.25rem;
+        background: var(--bs-body-bg, #fff);
+        font-weight: 600;
+        color: #0176d3;
+        padding: 0.3rem 0.75rem;
+        &:hover {
+            background: #eef4ff;
+        }
+        .oi {
+            width: 1.5rem;
+            height: 1.5rem;
+            line-height: 1.5rem;
+            border-radius: 0.25rem;
+            text-align: center;
+            color: #fff;
+            font-size: 1rem;
+        }
+        &.o_ss_kind_call .oi { background: var(--ss-tl-call); }
+        &.o_ss_kind_email .oi { background: var(--ss-tl-email); }
+        &.o_ss_kind_task .oi { background: var(--ss-tl-task); }
+        &.o_ss_kind_meeting .oi { background: var(--ss-tl-meeting); }
+        &.o_ss_kind_note .oi { background: var(--ss-tl-note); }
+    }
+    .o_ss_timeline_note_editor {
+        padding: 0.75rem 0;
+    }
+    .o_ss_timeline_toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.5rem 0;
+    }
+    .o_ss_timeline_filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+    .o_ss_filter_pill {
+        border-radius: 1rem;
+        border: 1px solid var(--bs-border-color, #c9c9c9);
+        padding: 0.1rem 0.75rem;
+        &.active {
+            background: #0176d3;
+            border-color: #0176d3;
+            color: #fff;
+        }
+    }
+    .o_ss_timeline_section {
+        margin-top: 0.75rem;
+    }
+    .o_ss_timeline_section_title {
+        font-weight: 700;
+        font-size: 0.8125rem;
+        background: var(--bs-tertiary-bg, #f3f3f3);
+        border-radius: 0.25rem;
+        padding: 0.35rem 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    .o_ss_timeline_empty,
+    .o_ss_timeline_empty_small {
+        color: var(--bs-secondary-color, #706e6b);
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    .o_ss_timeline_empty {
+        text-align: center;
+        padding: 1.5rem;
+    }
+    .o_ss_timeline_item {
+        position: relative;
+        display: flex;
+        gap: 0.75rem;
+        padding: 0 0.25rem 0.75rem 0.25rem;
+        // vertical line of the timeline
+        &::before {
+            content: "";
+            position: absolute;
+            left: calc(0.25rem + 0.875rem - 1px);
+            top: 2rem;
+            bottom: 0;
+            width: 2px;
+            background: var(--bs-border-color, #dddbda);
+        }
+        &:last-child::before {
+            display: none;
+        }
+        .o_ss_timeline_icon {
+            flex: 0 0 1.75rem;
+            height: 1.75rem;
+            border-radius: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            background: var(--ss-tl-task);
+            z-index: 1;
+        }
+        &.o_ss_kind_call .o_ss_timeline_icon { background: var(--ss-tl-call); }
+        &.o_ss_kind_email .o_ss_timeline_icon { background: var(--ss-tl-email); }
+        &.o_ss_kind_meeting .o_ss_timeline_icon { background: var(--ss-tl-meeting); }
+        &.o_ss_kind_note .o_ss_timeline_icon { background: var(--ss-tl-note); }
+        &.o_ss_overdue .o_ss_timeline_title {
+            color: #ba0517;
+        }
+        .o_ss_timeline_body {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        .o_ss_timeline_head {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            min-width: 0;
+        }
+        .o_ss_timeline_title {
+            font-weight: 600;
+            color: #0176d3;
+            min-width: 0;
+        }
+        .o_ss_timeline_date {
+            font-size: 0.8125rem;
+            color: var(--bs-secondary-color, #706e6b);
+            white-space: nowrap;
+        }
+        .o_ss_timeline_done {
+            padding: 0 0.35rem;
+            line-height: 1.4;
+        }
+        .o_ss_timeline_sub {
+            font-size: 0.8125rem;
+            color: var(--bs-secondary-color, #706e6b);
+            padding-left: 1.25rem;
+        }
+        .o_ss_timeline_note {
+            margin: 0.4rem 0 0 1.25rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem;
+            background: var(--bs-tertiary-bg, #f3f3f3);
+            font-size: 0.875rem;
+            overflow-wrap: anywhere;
+            p:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+}

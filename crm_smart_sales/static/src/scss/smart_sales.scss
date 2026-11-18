@@ -1,0 +1,271 @@
+// =====================================================================
+// Smart Sales CRM - modern design layer for CRM screens
+// Scoped to `.o_ss_smart` so other Odoo apps are never affected.
+// =====================================================================
+
+.o_ss_smart {
+    --ss-brand: #0176d3;
+    --ss-brand-dark: #014486;
+    --ss-brand-light: #eef4ff;
+    --ss-success: #2e844a;
+    --ss-warning: #dd7a01;
+    --ss-error: #ba0517;
+    --ss-text: var(--bs-body-color, #181818);
+    --ss-text-weak: var(--bs-secondary-color, #5c5c5c);
+    --ss-border: var(--bs-border-color, #e5e5e5);
+    --ss-card-bg: var(--bs-body-bg, #ffffff);
+    --ss-page-bg: var(--bs-tertiary-bg, #f3f3f3);
+    --ss-radius: 0.5rem;
+    --ss-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+// ---------------------------------------------------------------------
+// Record page (form)
+// ---------------------------------------------------------------------
+.o_form_view.o_ss_record_page {
+    .o_form_sheet_bg {
+        background: var(--ss-page-bg);
+    }
+    .o_form_sheet {
+        border-radius: var(--ss-radius);
+        box-shadow: var(--ss-shadow);
+        border: 1px solid var(--ss-border);
+    }
+    .o_form_statusbar {
+        .o_statusbar_buttons .btn-primary.o_ss_btn_convert {
+            background: var(--ss-brand);
+            border-color: var(--ss-brand);
+        }
+    }
+    // path look for the statusbars
+    .o_statusbar_status .o_arrow_button {
+        font-weight: 600;
+    }
+    .o_statusbar_status .o_arrow_button_current {
+        background-color: var(--ss-brand-dark) !important;
+        color: #fff !important;
+    }
+
+    .o_ss_highlights {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 1.75rem;
+        padding: 0.75rem 1rem;
+        margin: 0.25rem 0 1rem;
+        border: 1px solid var(--ss-border);
+        border-left: 4px solid var(--ss-brand);
+        border-radius: var(--ss-radius);
+        background: var(--ss-brand-light);
+
+        .o_ss_highlight {
+            display: flex;
+            flex-direction: column;
+            min-width: 7rem;
+            max-width: 16rem;
+            .o_field_widget {
+                width: auto;
+                font-weight: 600;
+            }
+        }
+        .o_ss_highlight_score {
+            min-width: 9rem;
+        }
+        .o_ss_highlight_label {
+            font-size: 0.75rem;
+            color: var(--ss-text-weak);
+            text-transform: none;
+            margin-bottom: 0.15rem;
+        }
+    }
+
+    .o_ss_duplicate_alert {
+        border-radius: var(--ss-radius);
+        margin-bottom: 0.75rem;
+        .o_field_widget {
+            width: auto;
+        }
+    }
+
+    .o_ss_path_assistant {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+        gap: 1rem;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid var(--ss-border);
+        border-radius: var(--ss-radius);
+        .o_ss_path_assistant_title {
+            font-weight: 700;
+            font-size: 0.8125rem;
+            margin-bottom: 0.5rem;
+            color: var(--ss-brand-dark);
+        }
+        .o_field_html {
+            width: 100%;
+        }
+    }
+    .o_ss_key_fields {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        .o_ss_key_field {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .o_ss_key_field_label {
+            color: var(--ss-text-weak);
+            min-width: 9rem;
+        }
+        .o_ss_key_field_value {
+            font-weight: 600;
+        }
+    }
+
+    .o_notebook {
+        .nav-tabs .nav-link.active {
+            border-bottom: 3px solid var(--ss-brand);
+            color: var(--ss-brand-dark);
+            font-weight: 600;
+        }
+    }
+    .o_ss_score_table {
+        max-width: 32rem;
+    }
+}
+
+// ---------------------------------------------------------------------
+// Kanban
+// ---------------------------------------------------------------------
+.o_kanban_view.o_ss_kanban {
+    background: var(--ss-page-bg);
+
+    .o_kanban_group {
+        background: transparent;
+    }
+    .o_kanban_header_title .o_column_title {
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.8125rem;
+        letter-spacing: 0.02em;
+    }
+    .o_kanban_record {
+        border-radius: var(--ss-radius);
+        border: 1px solid var(--ss-border);
+        box-shadow: var(--ss-shadow);
+        margin-bottom: 0.5rem;
+        transition: box-shadow 0.15s ease, transform 0.15s ease;
+        &:hover {
+            box-shadow: 0 4px 10px rgba(1, 118, 211, 0.18);
+            transform: translateY(-1px);
+        }
+        .fw-bold.fs-5 {
+            color: var(--ss-brand);
+        }
+    }
+    .o_ss_card_meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 0;
+        font-size: 0.8125rem;
+        .o_ss_card_company {
+            color: var(--ss-text);
+            font-weight: 600;
+            min-width: 0;
+        }
+    }
+    .o_ss_card_contact {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+        font-size: 0.8125rem;
+        color: var(--ss-text-weak);
+        min-width: 0;
+        > span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .oi {
+            font-size: 0.875rem;
+        }
+    }
+    .o_ss_card_values {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+    }
+    .o_ss_card_next {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.75rem;
+        padding: 0.2rem 0.4rem;
+        border-radius: 0.25rem;
+        background: var(--ss-brand-light);
+        color: var(--ss-brand-dark);
+        min-width: 0;
+        white-space: nowrap;
+        > span {
+            flex: 0 0 auto;
+        }
+        .o_field_widget {
+            min-width: 0;
+        }
+        .o_field_widget[name="activity_summary"] {
+            flex: 1 1 auto;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .o_field_widget[name="activity_date_deadline"] {
+            flex: 0 0 auto;
+        }
+    }
+    .o_ss_rating_badge .badge {
+        font-size: 0.7rem;
+    }
+}
+
+// ---------------------------------------------------------------------
+// List
+// ---------------------------------------------------------------------
+.o_list_view.o_ss_list {
+    .o_list_table {
+        thead th {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.02em;
+            color: var(--ss-text-weak);
+        }
+        tbody tr.o_data_row:hover > td {
+            background-color: var(--ss-brand-light);
+        }
+        .o_progressbar {
+            min-width: 6rem;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------
+// Dialogs
+// ---------------------------------------------------------------------
+.o_ss_convert_dialog {
+    .o_ss_convert_section {
+        border: 1px solid var(--bs-border-color, #e5e5e5);
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem 0.25rem;
+        margin-bottom: 0.75rem;
+    }
+    .o_ss_convert_section_title {
+        font-weight: 700;
+        color: #014486;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        margin-bottom: 0.35rem;
+    }
+}
